@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: indiaservice
+  labels:
+    app: indiaservice
+spec:
+  replicas: 1  # Number of pods to run
+  selector:
+    matchLabels:
+      app: indiaservice
+  template:
+    metadata:
+      labels:
+        app: indiaservice
+    spec:
+      containers:
+        - name: indiaservice
+          image: indiaservice  # Replace with your image name and tag
+          ports:
+            - containerPort

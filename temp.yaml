@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: indiaservice
+  labels:
+    job: node-api
+    app: indiaservice
+spec:
+  replicas: 1  # Number of pods to run
+  selector:
+    matchLabels:
+      app: indiaservice
+  template:
+    metadata:
+      labels:
+        app: indiaservice
+    spec:
+      containers:
+        - name: indiaservice
+          image: keyabagohil/map_innovative:latest 
+          imagePullPolicy: Never
+          ports:
+            - name : indiaweb
+              containerPort: 8050
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: indiaservice
+spec:
+  selector:
+    app: indiaservice  # This matches the app label in the Deployment
+  ports:
+    - protocol: TCP
+      port: 8050            # Expose port 80 externally in the cluster
+      targetPort: 8050 
+      # nodePort: 30050    # The port your Flask app is running on inside the container
+  type: LoadBalancer    
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata :
+  name: api-service-monitor
+  labels :
+    release: prometheus
+    app: prometheus
+spec :
+  jobLabel: job
+  endpoints :
+    - interval: 30s
+      port: indiaweb
+      path: /swagger-stats/metrics
+  selector:
+    matchLabels :
+      app: indiaservice
